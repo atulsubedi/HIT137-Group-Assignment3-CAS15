@@ -25,21 +25,27 @@ class Root(Tk):
 
         self.wm_title('Assignment 3')
         self.geometry("600x450")
+        self.minsize(600, 450)
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
         # === MENUBAR ===
         menubar = Menu(self)
         self.config(menu=menubar)
+        # define file menu as a submenu on the menubar
         file_menu = Menu(menubar, tearoff=0)
+        # define a cascade to contain file commands
         menubar.add_cascade(label="File", menu=file_menu)
+        # added commands and separators for file menu
         file_menu.add_command(label="save")
         file_menu.add_command(label="show folder")
         file_menu.add_command(label="change folder")
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.quit)
+        # added 2 menu commands on the menubar to create secondary windows
         menubar.add_command(label="Models", command=self.open_model_window)
         menubar.add_command(label="Info", command=self.open_info_window)
+        # added 1 menu command on the menubar to call a messagebox to explain functionality
         menubar.add_command(label="Help")
 
         # --------------------- Container
@@ -84,10 +90,10 @@ class Root(Tk):
             container, text="User Input Section", style='basic.TLabelframe')
         in_frame.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=10)
         in_frame.grid_columnconfigure(
-            0, weight=0, minsize=100)
+            0, weight=1, minsize=100)
 
-        in_frame.grid_columnconfigure(1, weight=1)
-        in_frame.grid_columnconfigure(2, weight=1, minsize=200)
+        in_frame.grid_columnconfigure(1, weight=1, minsize=220)
+        in_frame.grid_columnconfigure(2, weight=1, minsize=220)
 
         in_frame.grid_rowconfigure(0, weight=1)
         in_frame.grid_rowconfigure(1, weight=1)
@@ -95,38 +101,57 @@ class Root(Tk):
         in_frame.grid_rowconfigure(3, weight=1)
 
         # Objects in in_frame
-        browse_btn = Button(in_frame, text="Browse",
-                            command=self.browse, style='basic.TButton')
-        browse_btn.grid(row=0, column=0, sticky="w", padx=(10, 0), pady=(5, 0))
+        radio_frame = LabelFrame(in_frame, text='Input Type',
+                                 style='mini.TLabelframe')
+        radio_frame.grid(row=0, column=0, rowspan=2,
+                         sticky='nsew', padx=10, pady=(5, 0))
 
-        self.radio_var = StringVar(value="Text")  # default
+        radio_frame.grid_rowconfigure(0, weight=1)
+        radio_frame.grid_rowconfigure(1, weight=1)
+
+        radio_frame.grid_columnconfigure(0, weight=1)
+
+        self.radio_var = StringVar()  # default
 
         text_radio = Radiobutton(
-            in_frame, text='Text', value="Text", variable=self.radio_var, style='basic.TRadiobutton')
-        text_radio.grid(row=1, column=0, sticky="w", padx=(10, 0), pady=(5, 0))
+            radio_frame, text='Text', value="Text", variable=self.radio_var, command=self.update_input_mode, style='basic.TRadiobutton')
+        text_radio.grid(row=0, column=0, sticky="nwe",
+                        padx=(2, 0), pady=(2, 0))
 
         image_radio = Radiobutton(
-            in_frame, text='Image', value="Image", variable=self.radio_var, style='basic.TRadiobutton')
-        image_radio.grid(row=2, column=0, sticky="w",
-                         padx=(10, 0), pady=5)
+            radio_frame, text='Image', value="Image", variable=self.radio_var, command=self.update_input_mode, style='basic.TRadiobutton')
+        image_radio.grid(row=1, column=0, sticky="swe",
+                         padx=(2, 0), pady=(0, 2))
+
+        self.browse_btn = Button(in_frame, text="Browse",
+                                 command=self.browse, style='basic.TButton')
+        self.browse_btn.config(state='disabled')
+        self.browse_btn.grid(row=3, column=0, sticky="w", padx=10, pady=5)
 
         self.in_box = Text(in_frame, height=5, wrap='word')
-        self.in_box.grid(row=0, column=1, rowspan=3, columnspan=1,
+        self.in_box.grid(row=0, column=1, rowspan=4, columnspan=1,
                          sticky="nsew", padx=(0, 10), pady=5)
 
-        self.preview_label = Label(in_frame)
+        self.preview_label = Label(
+            in_frame, text='Image Preview', style='basic.TLabel')
+        self.preview_label.config(
+            anchor='center', relief='solid', font=('Arial', 12, 'bold'))
+        self.preview_label.config(
+            background='lightgray', foreground='darkgrey')
         self.preview_label.grid(
             row=0, column=2, rowspan=3, columnspan=1, sticky='nsew', padx=(0, 10), pady=5)
 
         btn_frame = Frame(in_frame, style='basic.TFrame')
         btn_frame.grid(row=3, column=2, sticky='nse',
-                       padx=(0, 10), pady=(0, 5))
+                       padx=(0, 10))
+
         btn_frame.grid_columnconfigure(0, weight=1)
         btn_frame.grid_columnconfigure(1, weight=1)
-        btn_frame.grid_columnconfigure(2, weight=5)
-        run1 = Button(btn_frame, text='Run Model 1')
+        btn_frame.grid_columnconfigure(2, weight=100)
+
+        run1 = Button(btn_frame, text='Run model 1')
         run1.grid(row=0, column=0, sticky='e', pady=5)
-        run2 = Button(btn_frame, text='Run Model 2')
+        run2 = Button(btn_frame, text='Run model 2')
         run2.grid(row=0, column=1, sticky='e', pady=5)
         clr = Button(btn_frame, text='Clr', command=self.clear)
         clr.grid(row=0, column=2, sticky='e', pady=5)
@@ -135,7 +160,7 @@ class Root(Tk):
         out_frame = LabelFrame(
             container, text="Model Output Section", style='basic.TLabelframe')
         out_frame.grid(row=2, column=0, columnspan=1,
-                       sticky="nsew", padx=10, pady=5)
+                       sticky="nsew", padx=10, pady=(5, 10))
         out_frame.grid_rowconfigure(1, weight=1)
         out_frame.grid_columnconfigure(0, weight=1)
 
@@ -149,7 +174,7 @@ class Root(Tk):
         # ----------------------------- place holder
         place_holder = LabelFrame(
             container, text='placeholder -- (will be substituted)')
-        place_holder.grid(row=2, column=1, sticky='nes', padx=10, pady=5)
+        place_holder.grid(row=2, column=1, sticky='nes', padx=10, pady=(5, 10))
 
         place_holder.grid_columnconfigure(0, weight=1)
         place_holder.grid_rowconfigure(1, weight=1)
@@ -170,12 +195,19 @@ class Root(Tk):
                 initialdir='/', title='Select an image', filetypes=[("Image files", "*.png;*.jpg;*.jpeg;*.bmp")])
 
         if file_path:
+            self.in_box.config(state="normal")
             self.in_box.delete('1.0', END)
             self.in_box.insert(INSERT, file_path)
 
+            if selection == "Image":
+                self.in_box.config(
+                    state="disabled", bg="lightgray", fg="darkgray")
+            else:
+                self.preview_label.config(
+                    background='lightgray', foreground='darkgray')
             img = Image.open(file_path)
             preview = img.copy()
-            preview.thumbnail((200, 200))  # keep aspect ratio
+            preview.thumbnail((220, 220))  # keep aspect ratio
 
             # Convert to Tkinter image and store reference
             self.img_preview = ImageTk.PhotoImage(preview)
@@ -186,11 +218,18 @@ class Root(Tk):
             self.model_input = np.array(img) / 255.0
 
     def clear(self):
+        self.in_box.config(state="normal")
         self.in_box.delete('1.0', END)
-        self.preview_label.config(image="", text="")   # remove image & text
-        self.img_preview = None                       # drop reference
-        self.in_box.delete("1.0", END)              # also clear file path
+        # remove image & text
+        self.preview_label.config(image="", text="Image Preview")
+        # drop reference
+        self.img_preview = None
+        # also clear file path
+        self.in_box.delete("1.0", END)
         self.model_input = None
+        if self.radio_var.get() == "Image":
+            self.in_box.config(
+                state="disabled", bg="lightgray", fg="darkgray")
 
     def open_model_window(self):
         # Open the secondary window
@@ -198,6 +237,17 @@ class Root(Tk):
 
     def open_info_window(self):
         InfoWindow(self)
+
+    def update_input_mode(self):
+        self.browse_btn.config(state='enabled')
+        if self.radio_var.get() == "Image":
+            self.in_box.config(state="disabled", bg="lightgray", fg="darkgray")
+            self.preview_label.config(background="gray95",
+                                      foreground="black")
+        else:
+            self.in_box.config(state="normal", bg="white", fg="black")
+            self.preview_label.config(
+                background='lightgray', foreground='darkgray')
 
 
 if __name__ == "__main__":

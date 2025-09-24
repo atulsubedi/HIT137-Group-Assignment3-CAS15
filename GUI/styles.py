@@ -49,6 +49,19 @@ def setup_styles(root):
         foreground="black",
         font=("Arial", 12, "bold")
     )
+    style.configure(
+        "mini.TLabelframe",
+        background="gray95",
+        bordercolor="black",
+        borderwidth=3,
+        relief="groove"
+    )
+    style.configure(
+        "mini.TLabelframe.Label",
+        background="gray95",
+        foreground="black",
+        font=("Arial", 10, "bold")
+    )
 
     # Notebook
     style.configure("TNotebook",
@@ -56,9 +69,9 @@ def setup_styles(root):
                     borderwidth=2)
     style.configure("TNotebook.Tab",
                     background="steelblue1",
-                    foreground="black",
+                    foreground="gray97",
                     padding=[10, 5],
-                    font=("Arial", 10))
+                    font=("Arial", 10, 'bold'))
     style.map("TNotebook.Tab",
               background=[("selected", "gray95"),
                           ("active", "gray97")],
