@@ -6,10 +6,6 @@ from PIL import Image, ImageTk
 
 import numpy as np
 
-import os
-import subprocess
-import sys
-
 from secondary_window import InfoWindow, ModelWindow
 from styles import setup_styles
 
@@ -46,7 +42,7 @@ class Root(Tk):
         menubar.add_command(label="Models", command=self.open_model_window)
         menubar.add_command(label="Info", command=self.open_info_window)
         # added 1 menu command on the menubar to call a messagebox to explain functionality
-        menubar.add_command(label="Help")
+        menubar.add_command(label="HELP!", command=self.help)
 
         # --------------------- Container
         # creating a frame and assigning it to the border
@@ -129,6 +125,7 @@ class Root(Tk):
         self.browse_btn.grid(row=3, column=0, sticky="w", padx=10, pady=5)
 
         self.in_box = Text(in_frame, height=5, wrap='word')
+        self.in_box.config(state="disabled", bg="lightgray", fg="darkgray")
         self.in_box.grid(row=0, column=1, rowspan=4, columnspan=1,
                          sticky="nsew", padx=(0, 10), pady=5)
 
@@ -248,6 +245,10 @@ class Root(Tk):
             self.in_box.config(state="normal", bg="white", fg="black")
             self.preview_label.config(
                 background='lightgray', foreground='darkgray')
+
+    def help(self):
+        tkinter.messagebox.showinfo('Happy to help.',
+                                    'Simply select the AI model you wish to use, then in the Input section select the input type you need, enter the information and click run model.\n\nOnce the AI has finished thinking, an output will be displayed in the output section below!')
 
 
 if __name__ == "__main__":
