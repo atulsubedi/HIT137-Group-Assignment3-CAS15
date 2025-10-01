@@ -121,11 +121,11 @@ class Root(Tk):
 
         self.browse_btn = Button(in_frame, text="Browse",
                                  command=self.browse, style='basic.TButton')
-        self.browse_btn.config(state='disabled')
         self.browse_btn.grid(row=3, column=0, sticky="w", padx=10, pady=5)
 
         self.in_box = Text(in_frame, height=5, wrap='word')
-        self.in_box.config(state="disabled", bg="lightgray", fg="darkgray")
+        self.in_box.config(font=("calibri", 11), bg="lightgray", fg="darkgray")
+        self.in_box.bind("<<Modified>>", self.check_inbox_content)
         self.in_box.grid(row=0, column=1, rowspan=4, columnspan=1,
                          sticky="nsew", padx=(0, 10), pady=5)
 
@@ -146,11 +146,13 @@ class Root(Tk):
         btn_frame.grid_columnconfigure(1, weight=1)
         btn_frame.grid_columnconfigure(2, weight=100)
 
+        """
         run1 = Button(btn_frame, text='Run model 1')
         run1.grid(row=0, column=0, sticky='e', pady=5)
-        run2 = Button(btn_frame, text='Run model 2')
+        """
+        run2 = Button(btn_frame, text='Run model', command=self.run)
         run2.grid(row=0, column=1, sticky='e', pady=5)
-        clr = Button(btn_frame, text='Clr', command=self.clear)
+        clr = Button(btn_frame, text='Clear', command=self.clear)
         clr.grid(row=0, column=2, sticky='e', pady=5)
 
         # ---------------------- out_frame
@@ -179,8 +181,28 @@ class Root(Tk):
         out_box = Text(place_holder, height=10, wrap='word')
         out_box.grid(row=1, column=0, sticky="nw", padx=10, pady=10)
 
+        # Stage groups
+        self.radio_widgets = [text_radio, image_radio]
+        self.input_widgets = [self.browse_btn, self.in_box, self.preview_label]
+        # buttons at bottom
+        self.action_widgets = [run2, clr]
+        for w in self.radio_widgets + self.input_widgets + self.action_widgets:
+            w.config(state='disabled')
+
     def on_button_click(self):
         print("Selected:", self.selected_option.get())
+        for w in self.radio_widgets:
+            w.config(state="normal")
+
+    def check_inbox_content(self, event=None):
+        self.in_box.edit_modified(False)
+        content = self.in_box.get("1.0", "end-1c").strip()
+        if content:
+            for w in self.action_widgets:
+                w.config(state="normal")
+        else:
+            for w in self.action_widgets:
+                w.config(state="disabled")
 
     def browse(self):
         selection = self.radio_var.get()
@@ -213,6 +235,22 @@ class Root(Tk):
             # Store model input as array for later
             img = img.resize((224, 224)).convert("RGB")
             self.model_input = np.array(img) / 255.0
+
+            # set state of action widgets to normal
+            for w in self.action_widgets:
+                w.config(state="normal")
+
+    def run(self):
+        # defines text_input as content in text box
+        """
+        might be a good idea to check what radiobutton is active (text/image)
+        then run separate functions for both or both combined in this function separated by an if statement
+        either or is good
+        """
+        text_input = self.in_box.get("1.0", "end-1c")
+        print(text_input)
+
+        """this function will then run the required functions from other files provided by team to return the AI output as output"""
 
     def clear(self):
         self.in_box.config(state="normal")
@@ -254,7 +292,6 @@ class Root(Tk):
 if __name__ == "__main__":
     root = Root()
     root.mainloop()
-
 
 # ------------------------------------ spare code
 
