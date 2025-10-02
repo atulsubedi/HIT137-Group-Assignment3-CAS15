@@ -1,4 +1,4 @@
-from ai_integration import run_text_model, run_image_model
+from GUI.ai.ai_integration import run_text_model, run_image_model
 from tkinter import *
 from tkinter.ttk import *
 
