@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.ttk import *
 
 from tkinter import filedialog
-from PIL import Image, Image
+from PIL import Image, ImageTk
 
 import numpy as np
 
@@ -155,37 +155,35 @@ class Root(Tk):
         clr = Button(btn_frame, text='Clear', command=self.clear)
         clr.grid(row=0, column=2, sticky='e', pady=5)
 
-        # ---------------------- out_frame
+        # ---------------------- output section
         out_frame = LabelFrame(
             container, text="Model Output Section", style='basic.TLabelframe')
-        out_frame.grid(row=2, column=0, columnspan=1,
+        out_frame.grid(row=2, column=0, columnspan=2,
                        sticky="nsew", padx=10, pady=(5, 10))
         out_frame.grid_rowconfigure(1, weight=1)
         out_frame.grid_columnconfigure(0, weight=1)
+        out_frame.grid_columnconfigure(1, weight=1, minsize=300)
 
         out_label = Label(out_frame, text='Output Display:',
                           style='basic.TLabel')
         out_label.grid(row=0, column=0, sticky='w', padx=(10, 0), pady=(10, 5))
 
         out_box = Text(out_frame, height=8, wrap='word')
-        out_box.grid(row=1, column=0, sticky="nsew", padx=10, pady=(0, 10))
+        out_box.grid(row=1, column=0, sticky="nsw", padx=(10, 5), pady=(0, 10))
 
-        # ----------------------------- place holder
-        place_holder = LabelFrame(
-            container, text='placeholder -- (will be substituted)')
-        place_holder.grid(row=2, column=1, sticky='nes', padx=10, pady=(5, 10))
-
-        place_holder.grid_columnconfigure(0, weight=1)
-        place_holder.grid_rowconfigure(1, weight=1)
-
-        out_box = Text(place_holder, height=10, wrap='word')
-        out_box.grid(row=1, column=0, sticky="nw", padx=10, pady=10)
+        self.out_img = Label(out_frame, text="Image Output")
+        self.out_img.config(anchor='center', relief='solid',
+                            font=('Arial', 12, 'bold'))
+        self.out_img.grid(
+            row=1, column=1, rowspan=1, columnspan=1, sticky='nsew',
+            padx=(5, 10), pady=(0, 5))
 
         # Stage groups
         self.radio_widgets = [text_radio, image_radio]
         self.input_widgets = [self.browse_btn, self.in_box, self.preview_label]
         # buttons at bottom
         self.action_widgets = [run2, clr]
+
         for w in self.radio_widgets + self.input_widgets + self.action_widgets:
             w.config(state='disabled')
 
