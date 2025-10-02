@@ -71,15 +71,15 @@ class Root(Tk):
         drop_label. grid(row=0, column=0, padx=10, pady=10, sticky='e')
 
         # Dropdown menu in banner
-        options = ["Model 1", "Model 2", "Model 3"]
-        self.selected_option = StringVar(value=options[0])
+        options = ["Text/Image Classification", "Model 2", "Model 3"]
+        self.model_selection = StringVar(value=options[0])
         dropdown = OptionMenu(
-            banner, self.selected_option, options[0], *options)
+            banner, self.model_selection, options[0], *options)
         dropdown.grid(row=0, column=1, padx=10, pady=10, sticky="w")
 
         # Button in banner
         button = Button(banner, text="Load Model",
-                        command=self.on_button_click, style='banner.TButton')
+                        command=self.load, style='banner.TButton')
         button.grid(row=0, column=2, padx=10, pady=10, sticky="e")
 
         # ------------------------ In_Frame
@@ -147,12 +147,8 @@ class Root(Tk):
         btn_frame.grid_columnconfigure(1, weight=1)
         btn_frame.grid_columnconfigure(2, weight=100)
 
-        """
-        run1 = Button(btn_frame, text='Run model 1')
-        run1.grid(row=0, column=0, sticky='e', pady=5)
-        """
-        run2 = Button(btn_frame, text='Run model', command=self.run)
-        run2.grid(row=0, column=1, sticky='e', pady=5)
+        run = Button(btn_frame, text='Run model', command=self.run)
+        run.grid(row=0, column=1, sticky='e', pady=5)
         clr = Button(btn_frame, text='Clear', command=self.clear)
         clr.grid(row=0, column=2, sticky='e', pady=5)
 
@@ -186,15 +182,17 @@ class Root(Tk):
         self.radio_widgets = [text_radio, image_radio]
         self.input_widgets = [self.browse_btn, self.in_box, self.preview_label]
         # buttons at bottom
-        self.action_widgets = [run2, clr]
+        self.action_widgets = [run, clr]
 
         for w in self.radio_widgets + self.input_widgets + self.action_widgets:
             w.config(state='disabled')
 
-    def on_button_click(self):
-        print("Selected:", self.selected_option.get())
+    def load(self):
+        model = self.model_selection.get()
+        print("Selected:", self.model_selection.get())
         for w in self.radio_widgets:
             w.config(state="normal")
+        return model
 
     def check_inbox_content(self, event=None):
         self.in_box.edit_modified(False)
@@ -250,6 +248,11 @@ class Root(Tk):
                     w.config(state="normal")
 
     def run(self):
+        model = self.model_selection.get()
+        if model == 'Text/Image Classification':
+            self.run_model_1()
+
+    def run_model_1(self):
         selection = self.radio_var.get()
 
         if selection == "Text":
