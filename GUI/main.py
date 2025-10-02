@@ -1,4 +1,4 @@
-from GUI.ai.ai_integration import run_text_model, run_image_model
+from ai.ai_integration import run_text_model, run_image_model
 from tkinter import *
 from tkinter.ttk import *
 
@@ -108,7 +108,7 @@ class Root(Tk):
 
         radio_frame.grid_columnconfigure(0, weight=1)
 
-        self.radio_var = StringVar()  # default
+        self.radio_var = StringVar()
 
         text_radio = Radiobutton(
             radio_frame, text='Text', value="Text", variable=self.radio_var, command=self.update_input_mode, style='basic.TRadiobutton')
@@ -170,6 +170,8 @@ class Root(Tk):
         out_label.grid(row=0, column=0, sticky='w', padx=(10, 0), pady=(10, 5))
 
         self.out_box = Text(out_frame, height=8, wrap='word')
+        self.out_box.config(font=("calibri", 11),
+                            bg="lightgray", fg="darkgray")
         self.out_box.grid(row=1, column=0, sticky="nsew",
                           padx=10, pady=(0, 10))
 
