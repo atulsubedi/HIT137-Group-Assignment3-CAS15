@@ -1,3 +1,4 @@
+from ai_integration import run_text_model, run_image_model
 from tkinter import *
 from tkinter.ttk import *
 
@@ -168,8 +169,9 @@ class Root(Tk):
                           style='basic.TLabel')
         out_label.grid(row=0, column=0, sticky='w', padx=(10, 0), pady=(10, 5))
 
-        out_box = Text(out_frame, height=8, wrap='word')
-        out_box.grid(row=1, column=0, sticky="nsw", padx=(10, 5), pady=(0, 10))
+        self.out_box = Text(out_frame, height=8, wrap='word')
+        self.out_box.grid(row=1, column=0, sticky="nsew",
+                          padx=10, pady=(0, 10))
 
         self.out_img = Label(out_frame, text="Image Output")
         self.out_img.config(anchor='center', relief='solid',
@@ -204,51 +206,61 @@ class Root(Tk):
 
     def browse(self):
         selection = self.radio_var.get()
+
         if selection == "Text":
             file_path = filedialog.askopenfilename(
-                initialdir='/', title='Select an image', filetypes=[("Text files", "*.txt")])
+                initialdir="/",
+                title="Select a text file",
+                filetypes=[("Text files", "*.txt")]
+            )
+            if file_path:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                self.in_box.config(state="normal", bg="white", fg="black")
+                self.in_box.delete("1.0", END)
+                self.in_box.insert("1.0", content)
+                self.preview_label.config(
+                    image="", text="Image Preview",
+                    background="lightgray", foreground="darkgrey"
+                )
+                for w in self.action_widgets:
+                    w.config(state="normal")
         elif selection == "Image":
             file_path = filedialog.askopenfilename(
-                initialdir='/', title='Select an image', filetypes=[("Image files", "*.png;*.jpg;*.jpeg;*.bmp")])
-
-        if file_path:
-            self.in_box.config(state="normal")
-            self.in_box.delete('1.0', END)
-            self.in_box.insert(INSERT, file_path)
-
-            if selection == "Image":
+                initialdir="/",
+                title="Select an image",
+                filetypes=[("Image files", "*.png;*.jpg;*.jpeg;*.bmp")]
+            )
+            if file_path:
+                self.in_box.config(state="normal")
+                self.in_box.delete("1.0", END)
+                self.in_box.insert("1.0", file_path)
                 self.in_box.config(
                     state="disabled", bg="lightgray", fg="darkgray")
-            else:
-                self.preview_label.config(
-                    background='lightgray', foreground='darkgray')
-            img = Image.open(file_path)
-            preview = img.copy()
-            preview.thumbnail((220, 220))  # keep aspect ratio
 
-            # Convert to Tkinter image and store reference
-            self.img_preview = ImageTk.PhotoImage(preview)
-            self.preview_label.config(image=self.img_preview)
+                img = Image.open(file_path)
+                preview = img.copy()
+                preview.thumbnail((220, 220))
+                self.img_preview = ImageTk.PhotoImage(preview)
+                self.preview_label.config(image=self.img_preview, text="")
 
-            # Store model input as array for later
-            img = img.resize((224, 224)).convert("RGB")
-            self.model_input = np.array(img) / 255.0
-
-            # set state of action widgets to normal
-            for w in self.action_widgets:
-                w.config(state="normal")
+                for w in self.action_widgets:
+                    w.config(state="normal")
 
     def run(self):
-        # defines text_input as content in text box
-        """
-        might be a good idea to check what radiobutton is active (text/image)
-        then run separate functions for both or both combined in this function separated by an if statement
-        either or is good
-        """
-        text_input = self.in_box.get("1.0", "end-1c")
-        print(text_input)
+        selection = self.radio_var.get()
 
-        """this function will then run the required functions from other files provided by team to return the AI output as output"""
+        if selection == "Text":
+            user_text = self.in_box.get("1.0", "end-1c")
+            output = run_text_model(user_text)
+        elif selection == "Image":
+            file_path = self.in_box.get("1.0", "end-1c")
+            output = run_image_model(file_path)
+        else:
+            output = "Please select input type (Text or Image)."
+
+        self.out_box.delete("1.0", "end")
+        self.out_box.insert("end", output)
 
     def clear(self):
         self.in_box.config(state="normal")
@@ -272,7 +284,7 @@ class Root(Tk):
         InfoWindow(self)
 
     def update_input_mode(self):
-        self.browse_btn.config(state='enabled')
+        self.browse_btn.config(state='normal')
         if self.radio_var.get() == "Image":
             self.in_box.config(state="disabled", bg="lightgray", fg="darkgray")
             self.preview_label.config(background="gray95",
