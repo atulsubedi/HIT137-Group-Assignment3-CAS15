@@ -182,12 +182,12 @@ class Root(Tk):
                     ("All files", "*.*")
                 ]
             )
-            print("Selected file:", file_path)  # ✅ Confirm selection
+            print("Selected file:", file_path) 
 
             if file_path:
                 try:
                     img = Image.open(file_path)
-                    print("Image opened")  # ✅ Confirm image opened
+                    print("Image opened")
                     preview = img.copy()
                     preview.thumbnail((220, 220))
                     self.img_preview = ImageTk.PhotoImage(preview)
@@ -196,7 +196,7 @@ class Root(Tk):
                     # store input as numpy array for model
                     img = img.resize((224, 224)).convert("RGB")
                     self.model_input = np.array(img) / 255.0
-                    print("Image processed and stored")  # ✅ Confirm image processed
+                    print("Image processed and stored")  
 
                     for w in self.action_widgets:
                         w.config(state="normal")
