@@ -71,8 +71,10 @@ class ModelWindow(SecondaryWindow):
         notebook.add(page2, text="Model 2")
 
         # Example content
-        Label(page1, text="Sentiment (Text) \n analysis using hugging face", font=("Arial", 14)).pack(pady=20)
-        Label(page2, text="Image classifiaction using \nhugging face model (Vision Transformer)", font=("Arial", 14)).pack(pady=20)
+        Label(page1, text="Sentiment (Text) \n analysis using hugging face",
+              font=("Arial", 14)).pack(pady=20)
+        Label(page2, text="Image classifiaction using \nhugging face model (Vision Transformer)", font=(
+            "Arial", 14)).pack(pady=20)
 
 
 # ----------------------------------------- INFO WINDOW

@@ -1,18 +1,19 @@
 from tkinter import *
 from tkinter.ttk import *
+from transformers import pipeline
+
 from tkinter import filedialog
 from PIL import Image, ImageTk
-import tkinter.messagebox
-from tkinter.messagebox import showinfo
+import numpy as np
 
 from secondary_window import InfoWindow, ModelWindow
 from styles import setup_styles
-from ai.ai_integration import AIIntegration   # NEW
+import tkinter.messagebox
 
 
 class Root(Tk):
     def __init__(self):
-        super().__init__()
+        Tk.__init__(self)
 
         setup_styles(self)
 
@@ -22,23 +23,27 @@ class Root(Tk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        # === AI INTEGRATION OBJECT ===
-        self.ai = AIIntegration()
-        self.img_preview = None
+        # === MODELS (load once here instead of inside run) ===
+        self.text_model = pipeline("sentiment-analysis")
+        self.image_model = pipeline(
+            "image-classification", model="google/vit-base-patch16-224")
+
+        # Storage
         self.model_input = None
+        self.img_preview = None
 
         # === MENUBAR ===
         menubar = Menu(self)
         self.config(menu=menubar)
-
+        """
         file_menu = Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="save")
         file_menu.add_command(label="show folder")
         file_menu.add_command(label="change folder")
         file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.quit)
-
+        file_menu.add_command(label="Exit", command=self.destroy)
+        """
         menubar.add_command(label="Models", command=self.open_model_window)
         menubar.add_command(label="Info", command=self.open_info_window)
         menubar.add_command(label="HELP!", command=self.help)
@@ -63,14 +68,14 @@ class Root(Tk):
                            style='banner.TLabel')
         drop_label.grid(row=0, column=0, padx=10, pady=10, sticky='e')
 
-        options = ["Text Sentiment", "Image Classification", "Model 3"]
-        self.model_selection = StringVar(value=options[0])
+        options = ["Text Sentiment", "Image Classifier"]
+        self.selected_option = StringVar(value=options[0])
         dropdown = OptionMenu(
-            banner, self.model_selection, options[0], *options)
+            banner, self.selected_option, options[0], *options)
         dropdown.grid(row=0, column=1, padx=10, pady=10, sticky="w")
 
         button = Button(banner, text="Load Model",
-                        command=self.load, style='banner.TButton')
+                        command=self.on_button_click, style='banner.TButton')
         button.grid(row=0, column=2, padx=10, pady=10, sticky="e")
 
         # ------------------------ In_Frame
@@ -91,20 +96,18 @@ class Root(Tk):
                          sticky='nsew', padx=10, pady=(5, 0))
 
         self.radio_var = StringVar()
-        self.text_radio = Radiobutton(
-            radio_frame, text='Text', value="Text", variable=self.radio_var,
-            command=self.update_input_mode, style='basic.TRadiobutton')
-        self.text_radio.grid(row=0, column=0, sticky="nwe",
-                             padx=(2, 0), pady=(2, 0))
+        text_radio = Radiobutton(radio_frame, text='Text', value="Text", variable=self.radio_var,
+                                 command=self.update_input_mode, style='basic.TRadiobutton')
+        text_radio.grid(row=0, column=0, sticky="nwe",
+                        padx=(2, 0), pady=(2, 0))
 
-        self.image_radio = Radiobutton(
-            radio_frame, text='Image', value="Image", variable=self.radio_var,
-            command=self.update_input_mode, style='basic.TRadiobutton')
-        self.image_radio.grid(row=1, column=0, sticky="swe",
-                              padx=(2, 0), pady=(0, 2))
+        image_radio = Radiobutton(radio_frame, text='Image', value="Image", variable=self.radio_var,
+                                  command=self.update_input_mode, style='basic.TRadiobutton')
+        image_radio.grid(row=1, column=0, sticky="swe",
+                         padx=(2, 0), pady=(0, 2))
 
-        self.browse_btn = Button(in_frame, text="Browse",
-                                 command=self.browse, style='basic.TButton')
+        self.browse_btn = Button(
+            in_frame, text="Browse", command=self.browse, style='basic.TButton')
         self.browse_btn.grid(row=3, column=0, sticky="w", padx=10, pady=5)
 
         self.in_box = Text(in_frame, height=5, wrap='word')
@@ -115,99 +118,71 @@ class Root(Tk):
 
         self.preview_label = Label(
             in_frame, text='Image Preview', style='basic.TLabel')
-        self.preview_label.config(
-            anchor='center', relief='solid', font=('Arial', 12, 'bold'),
-            background='lightgray', foreground='darkgrey')
+        self.preview_label.config(anchor='center', relief='solid', font=('Arial', 12, 'bold'),
+                                  background='lightgray', foreground='darkgrey')
         self.preview_label.grid(
-            row=0, column=2, rowspan=3, sticky='nsew',
-            padx=(0, 10), pady=5)
+            row=0, column=2, rowspan=3, sticky='nsew', padx=(0, 10), pady=5)
 
         btn_frame = Frame(in_frame, style='basic.TFrame')
         btn_frame.grid(row=3, column=2, sticky='nse', padx=(0, 10))
 
-        run = Button(btn_frame, text='Run model', command=self.run)
-        run.grid(row=0, column=1, sticky='e', pady=5)
+        run2 = Button(btn_frame, text='Run model', command=self.run)
+        run2.grid(row=0, column=1, sticky='e', pady=5)
         clr = Button(btn_frame, text='Clear', command=self.clear)
         clr.grid(row=0, column=2, sticky='e', pady=5)
 
-        # ---------------------- Output section
+        # ---------------------- out_frame
         out_frame = LabelFrame(
             container, text="Model Output Section", style='basic.TLabelframe')
-        out_frame.grid(row=2, column=0, columnspan=2,
-                       sticky="nsew", padx=10, pady=(5, 10))
+        out_frame.grid(row=2, column=0, sticky="nsew", padx=10, pady=(5, 10))
         out_frame.grid_rowconfigure(1, weight=1)
         out_frame.grid_columnconfigure(0, weight=1)
-        out_frame.grid_columnconfigure(1, weight=1, minsize=300)
 
         out_label = Label(out_frame, text='Output Display:',
                           style='basic.TLabel')
         out_label.grid(row=0, column=0, sticky='w', padx=(10, 0), pady=(10, 5))
 
         self.out_box = Text(out_frame, height=8, wrap='word')
-        self.out_box.config(font=("calibri", 11))
         self.out_box.grid(row=1, column=0, sticky="nsew",
                           padx=10, pady=(0, 10))
 
-        self.out_img = Label(out_frame, text="Image Output")
-        self.out_img.config(anchor='center', relief='solid',
-                            font=('Arial', 12, 'bold'))
-        self.out_img.grid(
-            row=1, column=1, sticky='nsew',
-            padx=(5, 10), pady=(0, 5))
-
-        # Stage groups
-        self.radio_widgets = [self.text_radio, self.image_radio]
+        # stage groups
+        self.radio_widgets = [text_radio, image_radio]
         self.input_widgets = [self.browse_btn, self.in_box, self.preview_label]
-        self.action_widgets = [run, clr]
-
+        self.action_widgets = [run2, clr]
         for w in self.radio_widgets + self.input_widgets + self.action_widgets:
             w.config(state='disabled')
 
-    # === GUI logic ===
-    def load(self):
-        model = self.model_selection.get()
-        print("Selected:", model)
-        if model == 'Text Sentiment':
-            self.radio_var.set(value='Text')
-            self.text_radio.config(state='enabled')
-            self.image_radio.config(state='disabled')
-            self.update_input_mode()
-        if model == 'Image Classification':
-            self.radio_var.set(value='Image')
-            self.image_radio.config(state='enabled')
-            self.text_radio.config(state='disabled')
-            self.update_input_mode()
-        return model
+    # === LOGIC FUNCTIONS ===
+    def run(self):
+        """Run the selected AI model on input text or image"""
+        selection = self.radio_var.get()
+        text_input = self.in_box.get("1.0", "end-1c").strip()
+        output_text = ""
 
-    def check_inbox_content(self, event=None):
-        self.in_box.edit_modified(False)
-        content = self.in_box.get("1.0", "end-1c").strip()
-        for w in self.action_widgets:
-            w.config(state="normal" if content else "disabled")
+        if selection == "Text" and text_input:
+            results = self.text_model(text_input)
+            output_text = f"Sentiment: {results[0]['label']} (confidence {results[0]['score']:.2f})"
+
+        elif selection == "Image" and self.model_input is not None:
+            img = Image.fromarray((self.model_input * 255).astype("uint8"))
+            results = self.image_model(img)
+            best = results[0]
+            output_text = f"Prediction: {best['label']} (confidence {best['score']:.2f})"
+
+        # insert result
+        self.out_box.config(state="normal")
+        self.out_box.delete("1.0", END)
+        self.out_box.insert("end", output_text)
+        self.out_box.config(state="disabled")
 
     def browse(self):
+        """Select input (text file or image)"""
         selection = self.radio_var.get()
-
-        if selection == "Text":
+        if selection == "Image":
             file_path = filedialog.askopenfilename(
-                title="Select a text file", filetypes=[("Text files", "*.txt")]
-            )
-            if file_path:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                self.in_box.config(state="normal", bg="white", fg="black")
-                self.in_box.delete("1.0", END)
-                self.in_box.insert("1.0", content)
-                self.preview_label.config(
-                    image="", text="Image Preview",
-                    background="lightgray", foreground="darkgrey"
-                )
-                for w in self.action_widgets:
-                    w.config(state="normal")
-
-        elif selection == "Image":
-            file_path = filedialog.askopenfilename(
-                title="Select an image",
+                title="Select Image File",
+                initialdir="/home/atul/homework",
                 filetypes=[
                     ("PNG files", "*.png"),
                     ("JPEG files", "*.jpg"),
@@ -217,42 +192,27 @@ class Root(Tk):
                     ("All files", "*.*")
                 ]
             )
+            print("Selected file:", file_path)
+
             if file_path:
-                self.in_box.config(state="normal")
-                self.in_box.delete("1.0", END)
-                self.in_box.insert("1.0", file_path)
-                self.in_box.config(
-                    state="disabled", bg="lightgray", fg="darkgray")
+                try:
+                    img = Image.open(file_path)
+                    print("Image opened")
+                    preview = img.copy()
+                    preview.thumbnail((220, 220))
+                    self.img_preview = ImageTk.PhotoImage(preview)
+                    self.preview_label.config(image=self.img_preview)
 
-                img = Image.open(file_path)
-                preview = img.copy()
-                preview.thumbnail((220, 220))
-                self.img_preview = ImageTk.PhotoImage(preview)
-                self.preview_label.config(
-                    image=self.img_preview, text="", background="white")
+                    # store input as numpy array for model
+                    img = img.resize((224, 224)).convert("RGB")
+                    self.model_input = np.array(img) / 255.0
+                    print("Image processed and stored")
 
-                for w in self.action_widgets:
-                    w.config(state="normal")
+                    for w in self.action_widgets:
+                        w.config(state="normal")
 
-    def run(self):
-        model = self.model_selection.get()
-        if model == 'Text Sentiment' or model == 'Image Classification':
-            self.run_model_1()
-
-    def run_model_1(self):
-        selection = self.radio_var.get()
-
-        if selection == "Text":
-            user_text = self.in_box.get("1.0", "end-1c")
-            output = self.ai.run_text_model(user_text)
-        elif selection == "Image":
-            file_path = self.in_box.get("1.0", "end-1c")
-            output = self.ai.run_image_model(file_path)
-        else:
-            output = "Please select input type (Text or Image)."
-
-        self.out_box.delete("1.0", "end")
-        self.out_box.insert("end", output)
+                except Exception as e:
+                    print("Failed to open image:", e)
 
     def clear(self):
         self.in_box.config(state="normal")
@@ -261,8 +221,19 @@ class Root(Tk):
         self.img_preview = None
         self.model_input = None
         if self.radio_var.get() == "Image":
-            self.in_box.config(
-                state="disabled", bg="lightgray", fg="darkgray")
+            self.in_box.config(state="disabled", bg="lightgray", fg="darkgray")
+
+    # === OTHER UI HELPERS ===
+    def on_button_click(self):
+        print("Selected:", self.selected_option.get())
+        for w in self.radio_widgets:
+            w.config(state="normal")
+
+    def check_inbox_content(self, event=None):
+        self.in_box.edit_modified(False)
+        content = self.in_box.get("1.0", "end-1c").strip()
+        for w in self.action_widgets:
+            w.config(state="normal" if content else "disabled")
 
     def open_model_window(self):
         ModelWindow(self)
@@ -271,7 +242,7 @@ class Root(Tk):
         InfoWindow(self)
 
     def update_input_mode(self):
-        self.browse_btn.config(state='normal')
+        self.browse_btn.config(state='enabled')
         if self.radio_var.get() == "Image":
             self.in_box.config(state="disabled", bg="lightgray", fg="darkgray")
             self.preview_label.config(background="gray95", foreground="black")
