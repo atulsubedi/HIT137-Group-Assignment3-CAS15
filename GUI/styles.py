@@ -78,3 +78,29 @@ def setup_styles(root):
               foreground=[("selected", "black"), ("active", "black")])
 
     return style
+
+
+def get_text_tags():
+    return {
+        "heading": {
+            "font": ("Arial", 12, "bold"),
+            "spacing3": 5,
+        },
+        "Subheading": {
+            "font": ("Arial", 11, "italic"),
+            "lmargin1": 40,
+            "lmargin2": 20,
+            "spacing1": 2,
+        },
+        "bullet": {
+            "lmargin1": 40,
+            "lmargin2": 60,
+        },
+        "body": {
+            "font": ("Arial", 11),
+            "lmargin1": 20,
+            "lmargin2": 20,
+            "spacing1": 2,
+            "spacing3": 5,
+        }
+    }

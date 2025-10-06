@@ -5,6 +5,8 @@ from PIL import Image, ImageTk
 import tkinter.messagebox
 from tkinter.messagebox import showinfo
 
+import numpy as np
+
 from secondary_window import InfoWindow, ModelWindow
 from styles import setup_styles
 from ai.ai_integration import AIIntegration   # NEW
@@ -22,10 +24,7 @@ class Root(Tk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        # === AI INTEGRATION OBJECT ===
         self.ai = AIIntegration()
-        self.img_preview = None
-        self.model_input = None
 
         # === MENUBAR ===
         menubar = Menu(self)
@@ -33,7 +32,7 @@ class Root(Tk):
 
         file_menu = Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="save")
+        file_menu.add_command(label="save Image Output")
         file_menu.add_command(label="show folder")
         file_menu.add_command(label="change folder")
         file_menu.add_separator()
@@ -223,13 +222,24 @@ class Root(Tk):
                 self.in_box.insert("1.0", file_path)
                 self.in_box.config(
                     state="disabled", bg="lightgray", fg="darkgray")
+                try:
+                    img = Image.open(file_path)
+                    print("Image opened")
+                    preview = img.copy()
+                    preview.thumbnail((220, 220))
+                    self.img_preview = ImageTk.PhotoImage(preview)
+                    self.preview_label.config(image=self.img_preview)
 
-                img = Image.open(file_path)
-                preview = img.copy()
-                preview.thumbnail((220, 220))
-                self.img_preview = ImageTk.PhotoImage(preview)
-                self.preview_label.config(
-                    image=self.img_preview, text="", background="white")
+                    # store input as numpy array for model
+                    img = img.resize((224, 224)).convert("RGB")
+                    self.model_input = np.array(img) / 255.0
+                    print("Image processed and stored")
+
+                    for w in self.action_widgets:
+                        w.config(state="normal")
+
+                except Exception as e:
+                    print("Failed to open image:", e)
 
                 for w in self.action_widgets:
                     w.config(state="normal")
