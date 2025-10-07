@@ -1,6 +1,8 @@
 from tkinter import *
 from tkinter.ttk import *
-from transformers import pipeline
+
+from ai_modules import ai_models
+#from transformers import pipeline
 
 from tkinter import filedialog
 from PIL import Image, ImageTk
@@ -23,10 +25,10 @@ class Root(Tk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        # === MODELS (load once here instead of inside run) ===
-        self.text_model = pipeline("sentiment-analysis")
-        self.image_model = pipeline(
-            "image-classification", model="google/vit-base-patch16-224")
+        self.text_model, self.image_model = ai_models()
+        # self.text_model = pipeline("sentiment-analysis")
+        # self.image_model = pipeline(
+        #     "image-classification", model="google/vit-base-patch16-224")
 
         # Storage
         self.model_input = None
@@ -182,7 +184,7 @@ class Root(Tk):
         if selection == "Image":
             file_path = filedialog.askopenfilename(
                 title="Select Image File",
-                initialdir="/home/atul/homework",
+                # initialdir="/home/atul/homework",
                 filetypes=[
                     ("PNG files", "*.png"),
                     ("JPEG files", "*.jpg"),
