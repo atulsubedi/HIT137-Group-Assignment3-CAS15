@@ -57,7 +57,7 @@ class ModelWindow(SecondaryWindow):
     @validate_master
     @auto_focus
     def __init__(self, master):
-        super().__init__(master, title="Model Information", size="500x400")
+        super().__init__(master, title="Model Information", size="350x300")
 
         notebook = Notebook(self, style="TNotebook")
         notebook.pack(fill="both", expand=True)
@@ -75,7 +75,7 @@ class ModelWindow(SecondaryWindow):
         )
 
         # Banner title
-        tab1_banner = Frame(tab1, style="baner.TFrame")
+        tab1_banner = Frame(tab1, style="banner.TFrame")
         tab1_banner.pack(fill='x')
         Label(tab1_banner, text='Text Sentiment Analysis',
               style='banner.TLabel').pack(pady=5)
@@ -107,9 +107,9 @@ class ModelWindow(SecondaryWindow):
         )
 
         # Banner title
-        tab1_banner = Frame(tab2, style="baner.TFrame")
-        tab1_banner.pack(fill='x')
-        Label(tab1_banner, text='Image Classification',
+        tab2_banner = Frame(tab2, style="banner.TFrame")
+        tab2_banner.pack(fill='x')
+        Label(tab2_banner, text='Image Classification',
               style='banner.TLabel').pack(pady=5)
         # Frame to hold text + scrollbar
         tab2_container = Frame(tab2)
@@ -130,12 +130,12 @@ class ModelWindow(SecondaryWindow):
         notebook.add(tab3, text="Model 3 (Coming Soon)")
 
         # Banner title
-        tab1_banner = Frame(tab2, style="baner.TFrame")
-        tab1_banner.pack(fill='x')
-        Label(tab1_banner, text='To Be Determined',
+        tab3_banner = Frame(tab3, style="banner.TFrame")
+        tab3_banner.pack(fill='x')
+        Label(tab3_banner, text='To Be Determined',
               style='banner.TLabel').pack(pady=5)
         # Frame to hold text + scrollbar
-        tab3_container = Frame(tab2)
+        tab3_container = Frame(tab3)
         tab3_container.pack(fill="both", expand=True)
         # Make the text widget expand properly
         tab3_container.grid_rowconfigure(0, weight=1)
@@ -144,7 +144,7 @@ class ModelWindow(SecondaryWindow):
         model_box3 = Text(tab3_container, wrap="word")
         model_box3.grid(row=0, column=0)
 
-        scrollbar3 = Scrollbar(tab3, command=model_box3.yview)
+        scrollbar3 = Scrollbar(tab3_container, command=model_box3.yview)
         model_box3.config(yscrollcommand=scrollbar3.set)
         scrollbar3.grid(row=0, column=1, sticky="ns")
 

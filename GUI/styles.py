@@ -86,7 +86,7 @@ def get_text_tags():
             "font": ("Arial", 12, "bold"),
             "spacing3": 5,
         },
-        "Subheading": {
+        "subheading": {
             "font": ("Arial", 11, "italic"),
             "lmargin1": 40,
             "lmargin2": 20,
