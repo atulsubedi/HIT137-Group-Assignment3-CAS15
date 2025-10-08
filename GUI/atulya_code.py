@@ -1,3 +1,5 @@
+#importing modules and dependencies that are required for the program
+
 from tkinter import *
 from tkinter.ttk import *
 
@@ -12,7 +14,7 @@ from secondary_window import InfoWindow, ModelWindow
 from styles import setup_styles
 import tkinter.messagebox
 
-
+#root class that contain majority of the logic happening in the project
 class Root(Tk):
     def __init__(self):
         Tk.__init__(self)
@@ -25,6 +27,7 @@ class Root(Tk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        #getting the text_mode and image_model from the ai_modules.py ai_model function
         self.text_model, self.image_model = ai_models()
         # self.text_model = pipeline("sentiment-analysis")
         # self.image_model = pipeline(
@@ -34,7 +37,7 @@ class Root(Tk):
         self.model_input = None
         self.img_preview = None
 
-        # === MENUBAR ===
+        # menubar
         menubar = Menu(self)
         self.config(menu=menubar)
         """
@@ -50,7 +53,7 @@ class Root(Tk):
         menubar.add_command(label="Info", command=self.open_info_window)
         menubar.add_command(label="HELP!", command=self.help)
 
-        # --------------------- Container
+        # container
         container = Frame(self, height=450, width=600, style='basic.TFrame')
         container.pack(side='top', fill='both', expand=True)
 
@@ -60,7 +63,7 @@ class Root(Tk):
         container.grid_columnconfigure(0, weight=1)
         container.grid_columnconfigure(1, weight=1)
 
-        # --------------------- Banner
+        # banner
         banner = Frame(container, style='banner.TFrame')
         banner.grid(row=0, column=0, columnspan=2, sticky='new')
         banner.grid_columnconfigure(0, weight=1)
@@ -80,7 +83,7 @@ class Root(Tk):
                         command=self.on_button_click, style='banner.TButton')
         button.grid(row=0, column=2, padx=10, pady=10, sticky="e")
 
-        # ------------------------ In_Frame
+        # frame
         in_frame = LabelFrame(
             container, text="User Input Section", style='basic.TLabelframe')
         in_frame.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=10)
@@ -225,7 +228,7 @@ class Root(Tk):
         if self.radio_var.get() == "Image":
             self.in_box.config(state="disabled", bg="lightgray", fg="darkgray")
 
-    # === OTHER UI HELPERS ===
+    
     def on_button_click(self):
         print("Selected:", self.selected_option.get())
         for w in self.radio_widgets:
