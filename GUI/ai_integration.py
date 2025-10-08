@@ -31,5 +31,3 @@ class AIIntegration:
             return f"Prediction: {best['label']} (confidence {best['score']:.2f})"
         except Exception as e:
             return f"Image processing failed: {e}"
-
-# please fucking load this to the github, why is it gone.

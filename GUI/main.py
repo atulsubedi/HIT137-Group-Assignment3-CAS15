@@ -5,6 +5,9 @@ from PIL import Image, ImageTk
 import tkinter.messagebox
 from tkinter.messagebox import showinfo
 
+import os
+import subprocess
+
 import numpy as np
 
 from secondary_window import InfoWindow, ModelWindow
@@ -29,15 +32,16 @@ class Root(Tk):
         # === MENUBAR ===
         menubar = Menu(self)
         self.config(menu=menubar)
-
+        """
         file_menu = Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="save Image Output")
-        file_menu.add_command(label="show folder")
-        file_menu.add_command(label="change folder")
+        file_menu.add_command(label="open save folder",
+                              command=self.open_folder)
+        file_menu.add_command(label="change save folder")
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.quit)
-
+        """
         menubar.add_command(label="Models", command=self.open_model_window)
         menubar.add_command(label="Info", command=self.open_info_window)
         menubar.add_command(label="HELP!", command=self.help)
@@ -295,6 +299,11 @@ class Root(Tk):
             'Happy to help.',
             'Select the AI model, choose Text or Image input, then click Run model.\n\nOutput will appear below.'
         )
+    """
+    def open_folder(self):
+        folder_path = os.path.join(os.path.expanduser("~"), "Pictures")
+        os.startfile(folder_path)
+    """
 
 
 if __name__ == "__main__":
