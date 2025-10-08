@@ -1,3 +1,4 @@
+# importing modules required to run the program
 from tkinter import *
 from tkinter.ttk import *
 from tkinter import filedialog
@@ -8,9 +9,11 @@ import numpy as np
 
 from secondary_window import InfoWindow, ModelWindow
 from styles import setup_styles
+
+# importing ai_modules from ai_integration.py to load the modules
 from ai_integration import AIIntegration
 
-
+# root class where every logic is build
 class Root(Tk):
     def __init__(self):
         super().__init__()
@@ -25,7 +28,7 @@ class Root(Tk):
 
         self.ai = AIIntegration()
 
-        # === MENUBAR ===
+        # menubar
         menubar = Menu(self)
         self.config(menu=menubar)
 
@@ -33,7 +36,7 @@ class Root(Tk):
         menubar.add_command(label="Info", command=self.open_info_window)
         menubar.add_command(label="HELP!", command=self.help)
 
-        # --------------------- Container
+        # container
         container = Frame(self, height=450, width=600, style='basic.TFrame')
         container.pack(side='top', fill='both', expand=True)
 
@@ -43,7 +46,7 @@ class Root(Tk):
         container.grid_columnconfigure(0, weight=1)
         container.grid_columnconfigure(1, weight=1)
 
-        # --------------------- Banner
+        # banner
         banner = Frame(container, style='banner.TFrame')
         banner.grid(row=0, column=0, columnspan=2, sticky='new')
         banner.grid_columnconfigure(0, weight=1)
@@ -63,7 +66,7 @@ class Root(Tk):
                         command=self.load, style='banner.TButton')
         button.grid(row=0, column=2, padx=10, pady=10, sticky="e")
 
-        # ------------------------ In_Frame
+        # frame
         in_frame = LabelFrame(
             container, text="User Input Section", style='basic.TLabelframe')
         in_frame.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=10)
@@ -120,7 +123,7 @@ class Root(Tk):
         clr = Button(btn_frame, text='Clear', command=self.clear)
         clr.grid(row=0, column=2, sticky='se', pady=5)
 
-        # ---------------------- Output section
+        # Output Box
         out_frame = LabelFrame(
             container, text="Model Output Section", style='basic.TLabelframe')
         out_frame.grid(row=2, column=0, columnspan=2,
@@ -145,7 +148,7 @@ class Root(Tk):
         for w in self.radio_widgets + self.input_widgets + self.action_widgets:
             w.config(state='disabled')
 
-    # === GUI logic ===
+    # logic for handling GUI interface
     def load(self):
         model = self.model_selection.get()
         print("Selected:", model)
@@ -197,7 +200,7 @@ class Root(Tk):
             except Exception as e:
                 tkinter.messagebox.showerror(
                     "File Error", f"Unable to read file:\n{e}")
-
+                # way to locate the image 
         elif selection == "Image":
             file_path = filedialog.askopenfilename(
                 title="Select an image",
