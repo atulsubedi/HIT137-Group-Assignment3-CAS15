@@ -1,9 +1,10 @@
 # ai_integration.py
+# importing required modules for the program
 from transformers import pipeline
 from PIL import Image
 import numpy as np
 
-
+# class that gets the AI module required for the assignment from hugging face
 class AIIntegration:
     def __init__(self):
         """Initialise AI models once for reuse (efficient)."""
@@ -11,7 +12,7 @@ class AIIntegration:
         self.image_model = pipeline(
             "image-classification", model="google/vit-base-patch16-224"
         )
-
+    # run text function, it runs on the basis of the input provided
     def run_text_model(self, text: str) -> str:
         """Run sentiment analysis on text input."""
         if not text.strip():
