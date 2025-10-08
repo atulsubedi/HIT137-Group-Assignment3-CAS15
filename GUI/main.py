@@ -73,7 +73,7 @@ class Root(Tk):
         in_frame.grid_rowconfigure(0, weight=1)
         in_frame.grid_rowconfigure(1, weight=1)
         in_frame.grid_rowconfigure(2, weight=1)
-        in_frame.grid_rowconfigure(3, weight=1)
+        in_frame.grid_rowconfigure(3, weight=1, minsize=50)
 
         radio_frame = LabelFrame(
             in_frame, text='Input Type', style='mini.TLabelframe')
@@ -95,7 +95,7 @@ class Root(Tk):
 
         self.browse_btn = Button(in_frame, text="Browse",
                                  command=self.browse, style='basic.TButton')
-        self.browse_btn.grid(row=3, column=0, sticky="w", padx=10, pady=5)
+        self.browse_btn.grid(row=3, column=0, sticky="sw", padx=10, pady=5)
 
         self.in_box = Text(in_frame, height=5, wrap='word')
         self.in_box.config(font=("calibri", 11), bg="lightgray", fg="darkgray")
@@ -116,9 +116,9 @@ class Root(Tk):
         btn_frame.grid(row=3, column=2, sticky='nse', padx=(0, 10))
 
         run = Button(btn_frame, text='Run model', command=self.run)
-        run.grid(row=0, column=1, sticky='e', pady=5)
+        run.grid(row=0, column=1, sticky='se', pady=5)
         clr = Button(btn_frame, text='Clear', command=self.clear)
-        clr.grid(row=0, column=2, sticky='e', pady=5)
+        clr.grid(row=0, column=2, sticky='se', pady=5)
 
         # ---------------------- Output section
         out_frame = LabelFrame(
@@ -174,18 +174,29 @@ class Root(Tk):
             file_path = filedialog.askopenfilename(
                 title="Select a text file", filetypes=[("Text files", "*.txt")]
             )
-            if file_path:
+            try:
+                # Read all lines from the selected text file
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
+
+                # Insert into the text box
                 self.in_box.config(state="normal", bg="white", fg="black")
                 self.in_box.delete("1.0", END)
-                self.in_box.insert("1.0", content)
+                self.in_box.insert("1.0", content.strip())
+
+                # Reset preview since it's text mode
                 self.preview_label.config(
-                    image="", text="Image Preview",
-                    background="lightgray", foreground="darkgrey"
+                    image="", text="Text Input Loaded",
+                    background="lightgray", foreground="black"
                 )
+
+                # Enable action buttons
                 for w in self.action_widgets:
                     w.config(state="normal")
+
+            except Exception as e:
+                tkinter.messagebox.showerror(
+                    "File Error", f"Unable to read file:\n{e}")
 
         elif selection == "Image":
             file_path = filedialog.askopenfilename(
@@ -222,7 +233,9 @@ class Root(Tk):
                         w.config(state="normal")
 
                 except Exception as e:
-                    print("Failed to open image:", e)
+                    tkinter.messagebox.showerror(
+                        "File Error", f"Unable to open image:\n{e}"
+                    )
 
                 for w in self.action_widgets:
                     w.config(state="normal")
