@@ -9,7 +9,7 @@ import numpy as np
 
 from secondary_window import InfoWindow, ModelWindow
 from styles import setup_styles
-from ai.ai_integration import AIIntegration
+from ai_integration import AIIntegration
 
 
 class Root(Tk):
