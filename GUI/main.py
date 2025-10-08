@@ -4,10 +4,6 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 import tkinter.messagebox
 from tkinter.messagebox import showinfo
-
-import os
-import subprocess
-
 import numpy as np
 
 from secondary_window import InfoWindow, ModelWindow
@@ -32,16 +28,7 @@ class Root(Tk):
         # === MENUBAR ===
         menubar = Menu(self)
         self.config(menu=menubar)
-        """
-        file_menu = Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="save Image Output")
-        file_menu.add_command(label="open save folder",
-                              command=self.open_folder)
-        file_menu.add_command(label="change save folder")
-        file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.quit)
-        """
+
         menubar.add_command(label="Models", command=self.open_model_window)
         menubar.add_command(label="Info", command=self.open_info_window)
         menubar.add_command(label="HELP!", command=self.help)
@@ -140,7 +127,6 @@ class Root(Tk):
                        sticky="nsew", padx=10, pady=(5, 10))
         out_frame.grid_rowconfigure(1, weight=1)
         out_frame.grid_columnconfigure(0, weight=1)
-        out_frame.grid_columnconfigure(1, weight=1, minsize=300)
 
         out_label = Label(out_frame, text='Output Display:',
                           style='basic.TLabel')
@@ -150,13 +136,6 @@ class Root(Tk):
         self.out_box.config(font=("calibri", 11))
         self.out_box.grid(row=1, column=0, sticky="nsew",
                           padx=10, pady=(0, 10))
-
-        self.out_img = Label(out_frame, text="Image Output")
-        self.out_img.config(anchor='center', relief='solid',
-                            font=('Arial', 12, 'bold'))
-        self.out_img.grid(
-            row=1, column=1, sticky='nsew',
-            padx=(5, 10), pady=(0, 5))
 
         # Stage groups
         self.radio_widgets = [self.text_radio, self.image_radio]
@@ -251,19 +230,18 @@ class Root(Tk):
     def run(self):
         model = self.model_selection.get()
         if model == 'Text Sentiment' or model == 'Image Classification':
-            self.run_model_1()
-
-    def run_model_1(self):
-        selection = self.radio_var.get()
-
-        if selection == "Text":
-            user_text = self.in_box.get("1.0", "end-1c")
-            output = self.ai.run_text_model(user_text)
-        elif selection == "Image":
-            file_path = self.in_box.get("1.0", "end-1c")
-            output = self.ai.run_image_model(file_path)
+            # retrieves current radiobutton selection
+            selection = self.radio_var.get()
+            if selection == "Text":
+                user_text = self.in_box.get("1.0", "end-1c")
+                output = self.ai.run_text_model(user_text)
+            elif selection == "Image":
+                file_path = self.in_box.get("1.0", "end-1c")
+                output = self.ai.run_image_model(file_path)
+            else:
+                output = "Please select input type (Text or Image)."
         else:
-            output = "Please select input type (Text or Image)."
+            output = "Please Make a model Selection"
 
         self.out_box.delete("1.0", "end")
         self.out_box.insert("end", output)
@@ -297,13 +275,8 @@ class Root(Tk):
     def help(self):
         tkinter.messagebox.showinfo(
             'Happy to help.',
-            'Select the AI model, choose Text or Image input, then click Run model.\n\nOutput will appear below.'
+            'Select the AI model, choose Text or Image input (depending on the model it may be locked)\nthen click Run model.\n\nOutput will appear below.'
         )
-    """
-    def open_folder(self):
-        folder_path = os.path.join(os.path.expanduser("~"), "Pictures")
-        os.startfile(folder_path)
-    """
 
 
 if __name__ == "__main__":
