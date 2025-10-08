@@ -53,7 +53,7 @@ class Root(Tk):
                            style='banner.TLabel')
         drop_label.grid(row=0, column=0, padx=10, pady=10, sticky='e')
 
-        options = ["Text Sentiment", "Image Classification", "Model 3"]
+        options = ["Text Sentiment", "Image Classification"]
         self.model_selection = StringVar(value=options[0])
         dropdown = OptionMenu(
             banner, self.model_selection, options[0], *options)

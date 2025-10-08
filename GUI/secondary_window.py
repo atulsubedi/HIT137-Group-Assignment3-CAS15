@@ -125,44 +125,17 @@ class ModelWindow(SecondaryWindow):
         model_box2.config(yscrollcommand=scrollbar2.set)
         scrollbar2.grid(row=0, column=1, sticky="ns")
 
-        # === Tab 3: Placeholder ===
-        tab3 = Frame(notebook, style="basic.TFrame")
-        notebook.add(tab3, text="Model 3 (Coming Soon)")
-
-        # Banner title
-        tab3_banner = Frame(tab3, style="banner.TFrame")
-        tab3_banner.pack(fill='x')
-        Label(tab3_banner, text='To Be Determined',
-              style='banner.TLabel').pack(pady=5)
-        # Frame to hold text + scrollbar
-        tab3_container = Frame(tab3)
-        tab3_container.pack(fill="both", expand=True)
-        # Make the text widget expand properly
-        tab3_container.grid_rowconfigure(0, weight=1)
-        tab3_container.grid_columnconfigure(0, weight=1)
-
-        model_box3 = Text(tab3_container, wrap="word")
-        model_box3.grid(row=0, column=0)
-
-        scrollbar3 = Scrollbar(tab3_container, command=model_box3.yview)
-        model_box3.config(yscrollcommand=scrollbar3.set)
-        scrollbar3.grid(row=0, column=1, sticky="ns")
-
         # Configure text tags for styling
         tags = get_text_tags()
         for tag, opts in tags.items():
             model_box1.tag_configure(tag, **opts)
             model_box2.tag_configure(tag, **opts)
-            model_box3.tag_configure(tag, **opts)
 
         model_box1.insert("1.0", model_desc1, 'body')
         model_box2.insert("1.0", text_desc2, 'body')
-        model_box3.insert(
-            "1.0", "A future model will be defined here.", 'body')
 
         model_box1.config(state="disabled")
         model_box2.config(state="disabled")
-        model_box3.config(state="disabled")
 
 # ----------------------------------------- INFO WINDOW
 
